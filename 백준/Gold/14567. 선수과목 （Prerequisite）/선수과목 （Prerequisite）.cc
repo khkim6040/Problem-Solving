@@ -1,51 +1,33 @@
 #include <iostream>
-#include <vector>
-#include <queue>
 using namespace std;
 
-
 int N, M;
-int inorder[1005];
-int answer[1005];
+int dp[1005];
+bool is_required_to[1005][1005];
 
 int main() {
     ios_base::sync_with_stdio(false); cin.tie(NULL);
     cin >> N >> M;
-    vector<vector<int>> graph(N+1);
     for(int i=0; i<M; i++) {
         int s, e;
         cin >> s >> e;
-        graph[s].push_back(e);
-        inorder[e]++;
-    }
+        is_required_to[s][e] = true;
+    }        
 
-    // Topological Ordering
-    queue<int> q;
+
     for(int i=1; i<=N; i++) {
-        if(inorder[i]==0) {
-            q.push(i);
-        }
-    }
-
-    int count = 0;
-    while(!q.empty()) {
-        int size = q.size();
-        count++;
-        for(int i=0; i<size; i++) {
-            int cur = q.front();
-            q.pop();
-            answer[cur] = count;
-            for(int next: graph[cur]) {
-                inorder[next]--;
-                if(inorder[next]==0) {
-                    q.push(next);
-                }
+        dp[i] = 1;
+        int max_required_semester = 1;
+        for(int j=1; j<i; j++) {
+            if(is_required_to[j][i]) {
+                max_required_semester = max(max_required_semester, dp[j]+1);
             }
         }
+        dp[i] = max_required_semester;
     }
 
     for(int i=1; i<=N; i++) {
-        cout << answer[i] << ' ';
+        cout << dp[i] << ' ';
     }
     return 0;
 }
