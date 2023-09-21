@@ -5,7 +5,7 @@
 using namespace std;
 
 int M;
-int dp[2023];
+int dp[1005];
 unordered_map<string, int> point_map;
 vector<string> words;
 
