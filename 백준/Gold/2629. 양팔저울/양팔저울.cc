@@ -5,7 +5,7 @@ using namespace std;
 
 int N, M;
 int set[35];
-bool isSubset[80005][35]; // [MAX_WEIGHT][N]
+bool isSubset[35][MAX_WEIGHT]; // [N][MAX_WEIGHT]
 
 int main() {
     ios_base::sync_with_stdio(false); cin.tie(NULL);
@@ -16,14 +16,14 @@ int main() {
     }
     // Fill DP table subset sum and diff
     for(int i=1; i<=MAX_WEIGHT; i++) {
-        isSubset[i][0] = false;
+        isSubset[0][i] = false;
     }
     for(int i=0; i<=N; i++) {
-        isSubset[0][i] = true;
+        isSubset[i][0] = true;
     }
-    for(int j=1; j<=N; j++) {
-        for(int i=1; i<=MAX_WEIGHT; i++) {
-            isSubset[i][j] = isSubset[i][j-1] || isSubset[i+set[j]][j-1] || isSubset[abs(i-set[j])][j-1];
+    for(int i=1; i<=N; i++) {
+        for(int j=1; j<=MAX_WEIGHT; j++) {
+            isSubset[i][j] = isSubset[i-1][j] || isSubset[i-1][j+set[i]] || isSubset[i-1][abs(j-set[i])];
         }
     }
     // Output
@@ -31,7 +31,7 @@ int main() {
     for(int k=0; k<M; k++) {
         int target;
         cin >> target;
-        if(isSubset[target][N]) {
+        if(isSubset[N][target]) {
             cout << "Y" << ' ';
         }
         else {
