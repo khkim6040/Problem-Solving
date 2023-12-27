@@ -7,7 +7,6 @@ using namespace std;
 struct Point {
     long long x;
     long long y;
-    bool is_used;
     bool const operator<(const Point other) {
         if (y == other.y) {
             return x < other.x;
@@ -26,6 +25,23 @@ bool is_CCW(Point pre, Point cur, Point next) {
     return s > 0;
 }
 
+int make_convex_hull() {
+    stack<Point> s;
+    for (Point next : points) {
+        while (s.size() >= 2) {
+            Point cur = s.top();
+            s.pop();
+            Point pre = s.top();
+            if (is_CCW(pre, cur, next)) {
+                s.push(cur);
+                break;
+            }
+        }
+        s.push(next);
+    }
+    return s.size();
+}
+
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(NULL);
@@ -33,56 +49,16 @@ int main() {
     for (int i = 0; i < N; i++) {
         long long x, y;
         cin >> x >> y;
-        points.push_back({x, y, false});
+        points.push_back({x, y});
     }
 
     // right half convex hull
     sort(points.begin(), points.end());
-    stack<Point> s1;
-    for (Point next : points) {
-        while (s1.size() >= 2) {
-            Point cur = s1.top();
-            cur.is_used = false;
-            s1.pop();
-            Point pre = s1.top();
-            if (is_CCW(pre, cur, next)) {
-                cur.is_used = true;
-                s1.push(cur);
-                break;
-            }
-        }
-        next.is_used = true;
-        s1.push(next);
-    }
-
+    int right_hull_size = make_convex_hull();
     // left half convex hull
     reverse(points.begin(), points.end());
-    // should consider first&last point
-    points.front().is_used = false;
-    points.back().is_used = false;
-    stack<Point> s2;
+    int left_hull_size = make_convex_hull();
 
-    for (Point next : points) {
-        // if point is already used in left convex hall, ignore it
-        if (next.is_used)
-            continue;
-
-        while (s2.size() >= 2) {
-            Point cur = s2.top();
-            cur.is_used = false;
-            s2.pop();
-            Point pre = s2.top();
-            if (is_CCW(pre, cur, next)) {
-                cur.is_used = true;
-                s2.push(cur);
-                break;
-            }
-        }
-        next.is_used = true;
-        s2.push(next);
-    }
-
-    int answer = s1.size() + s2.size() - 2;
-    cout << answer;
+    cout << right_hull_size + left_hull_size - 2;
     return 0;
 }
