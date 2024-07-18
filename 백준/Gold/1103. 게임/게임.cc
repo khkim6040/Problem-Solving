@@ -34,7 +34,10 @@ int DFS(int NowS, int NowG) {
     if (Memo[NowS][NowG])
         return Memo[NowS][NowG];
 
+    IsVisit[NowS][NowG] = 1;
+
     bool flag = false;
+
     for (int idx = 0; idx < 4; idx++) {
         int NextS = NowS + (Map[NowS][NowG] - '0') * dS[idx];
         int NextG = NowG + (Map[NowS][NowG] - '0') * dG[idx];
@@ -42,31 +45,37 @@ int DFS(int NowS, int NowG) {
         if (NextS >= 1 && NextG >= 1 && NextS <= Sero && NextG <= Garo) {
             if ('1' <= Map[NextS][NextG] && Map[NextS][NextG] <= '9') {
                 flag = true;
+
                 if (IsVisit[NextS][NextG] == 1)
                     IsCycle = 1;
                 else {
-                    IsVisit[NextS][NextG] = 1;
                     Memo[NowS][NowG] = Max(Memo[NowS][NowG], DFS(NextS, NextG) + 1);
-                    IsVisit[NextS][NextG] = 0;
                 }
             }
         }
     }
 
     if (!flag) Memo[NowS][NowG] = 1;
+    IsVisit[NowS][NowG] = 0;
     return Memo[NowS][NowG];
 }
 
 void Solve() {
     Input();
 
-    IsVisit[1][1] = 1;
     int Answer = DFS(1, 1);
 
     if (IsCycle == 1)
         printf("-1\n");
     else
         printf("%d\n", Answer);
+
+    // for (int i = 1; i <= Sero; i++) {
+    //     for (int j = 1; j <= Garo; j++) {
+    //         printf("%d", Memo[i][j]);
+    //     }
+    //     printf("\n");
+    // }
 }
 
 int main(void) {
