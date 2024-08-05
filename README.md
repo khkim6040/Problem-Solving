@@ -1,2 +1,3 @@
 # Problem-Solving
-This is a auto push repository for Baekjoon Online Judge created with [BaekjoonHub](https://github.com/BaekjoonHub/BaekjoonHub).
+Baekjoon handle @khkim6040
+Solved.ac [@khkim6040](https://solved.ac/profile/khkim6040)
