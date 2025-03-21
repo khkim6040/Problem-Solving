@@ -2,135 +2,122 @@
 #include <vector>
 #include <algorithm>
 #include <iostream>
+#include <map>
+#include <algorithm>
+#include <iostream>
 using namespace std;
 
+int N;
+vector<vector<int>> comb;
+vector<int> temp;
+map<vector<int>, vector<int>> m; // m[주사위 조합 경우] = 가능한 모든 값들
+int _max;
+vector<int> temp_ans;
 
-// 절반을 선택할때 선택한 리스트들
-vector<vector<int>> ListA;
-vector<vector<int>> ListB;
-
-vector<int> SumA;
-vector<int> SumB;
-
-int sortnum = 0;
-int choice = 0;
-
-
-void MakeList(int now,int count, vector<int>A, vector<int>B) {// now 현재위치 , count 고를 수 
-
-    int tempA = A.size();
-    int tempB = B.size();
-
-
-    if (tempA == count && tempB == count) {
-        ListA.push_back(A);
-        ListB.push_back(B);
+void dfs(int cur, int level) {
+    if(level == N/2) {
+        comb.push_back(temp);
         return;
     }
-
-    if (tempA == count) {
-        B.push_back(now);
-        MakeList(now + 1, count, A, B);
-    }
-    else if (tempB == count) {
-        A.push_back(now);
-        MakeList(now + 1, count, A, B);
-    }
-    else {
-        A.push_back(now);
-        MakeList(now + 1, count, A, B);
-        A.pop_back();
-
-        B.push_back(now);
-        MakeList(now + 1, count, A, B);
-        B.pop_back();
-
+    
+    for(int i=cur+1; i<N; i++) {
+        temp.push_back(i);
+        dfs(i, level+1);
+        temp.pop_back();
     }
 }
 
-void sumCal(int count, int maxSum, vector<int> List, vector<vector<int>> dice) {
-
-    if (count == 0) {
-
-        if (sortnum == 0) {
-            SumA.push_back(maxSum);
-        }
-        else {
-            SumB.push_back(maxSum);
-        }
-
+void roll(vector<vector<int>> dice, vector<int> _case, int level, int sum) {
+    if(level == N/2) {
+        m[_case].push_back(sum);
         return;
     }
 
-
-    for (int i = 0; i < dice[List[count-1]].size(); i++) {
-        sumCal(count - 1, maxSum + dice[List[count-1]][i], List, dice);
+    vector<int> d = dice[_case[level]];
+    for(int i=0; i<6; i++) {
+        int temp = sum + d[i];
+        roll(dice, _case, level+1, temp);
     }
 }
 
+vector<int> get_opponent(vector<int> me) {
+    vector<bool> chk(N, true);
+    for(auto e: me) {
+        chk[e] = false;
+    }
+    vector<int> res;
+    for(int i=0; i<N; i++) {
+        if(chk[i]) res.push_back(i);
+    }
+    return res;
+}
 
-// 몇번째 다이스에서 숫자 머를 뽑았는지 해서 모든 합을 구해야할듯
-vector<int> diceCal(vector<vector<int>> dice) { // 현재 골라놓은 다이스리스트들
+void match(vector<int> c) {
+    vector<int> me = m[c];
+    vector<int> opp = m[(get_opponent(c))];
+    
+    sort(me.begin(), me.end());
+    sort(opp.begin(), opp.end());
+    
+    int sum = 0;
+    for(auto e: me) {  
+        int lower = lower_bound(opp.begin(), opp.end(), e) - opp.begin();
 
-    int Maxvictory = 0;
-    vector<int>MaxList; // 가장 합이 
-
-    for (int i = 0; i < ListA.size(); i++) {
-
-        sortnum = 0;
-        sumCal(choice, 0, ListA[i], dice);
-
-        sortnum = 1;
-        sumCal(choice, 0, ListB[i], dice);
-
-
-        // 서로의 합이 나온 부분
-
-        int maxTemp = 0;
-
-
-
-        for (int j = 0; j < SumA.size(); j++) {
-
-            for (int k = 0; k < SumB.size(); k++) {
-                if (SumA[j] > SumB[k]) {
-                    maxTemp += 1;
-                }
-                
-            }
-        }
-        if (maxTemp > Maxvictory) { // 승리할 확률 최신화
-            Maxvictory = maxTemp;
-
-            sort(ListA[i].begin(), ListA[i].end());
-            MaxList= ListA[i];
-        }
-
-        SumA.clear();
-        SumB.clear();
+        sum += lower;
+    }
+    if(sum > _max) {
+        _max = sum;
+        temp_ans = c;
     }
 
-    return MaxList;
+        //     cout << "Case: ";
+        // for(auto d: c) {
+        //      cout << d << ' ';
+        // }
+        // cout << '\n';
+        // cout << lower << '\n';
 
 }
 
 vector<int> solution(vector<vector<int>> dice) {
     vector<int> answer;
-    vector<int> A, B;
-
-
-    int n = dice.size();
-    choice = n / 2;
-
-    MakeList(0, choice, A, B); // 시작 위치 / 선택할 주사위 수 
-
-
-    answer=diceCal(dice);
-
-    for (int i = 0; i < answer.size(); i++) {
-        answer[i] += 1;
+    N = dice.size();
+    
+    // 조합
+    dfs(-1, 0);
+    
+//     for(auto vec: comb) {
+//         for(auto e: vec) {
+//             cout << e << ' ';
+//         }
+//         cout << '\n';
+//     }
+    
+    // 모든 경우의 수 뽑기
+    for(auto _case: comb) {
+        roll(dice, _case, 0, 0);
     }
-
+    
+//     for(auto iter: m) {
+//         cout << iter.first.size() << '\n';
+//         cout << iter.second.size() << '\n';
+//         for(auto e: iter.second) {
+//             cout << e << ' ';
+//         }
+//         cout << '\n';
+//     }
+    
+    // 조합별로 매치 시키기
+    // 이길 확률 구하기
+    // 최댓값
+    for(auto c: comb) {
+        match(c);
+    }
+    
+    for(auto e: temp_ans) {
+        answer.push_back(e+1);
+    }
+    
 
     return answer;
 }
