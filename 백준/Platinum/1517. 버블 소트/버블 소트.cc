@@ -14,8 +14,8 @@
 using namespace std;
 
 struct Node {
-    ll v;
-    ll idx;
+    int v;
+    int idx;
 
     bool operator< (const Node& other) const {
         if(v==other.v) {
@@ -28,15 +28,15 @@ struct Node {
 vector<Node> vec;
 
 int N;
-ll t[2000005]; 
+int t[2000005]; 
 
-void update(ll node, ll s, ll e, ll idx) {
+void update(int node, int s, int e, int idx) {
     if(s==e) {
         t[node] = 1;
         return;
     }
 
-    ll mid = (s+e)/2;
+    int mid = (s+e)/2;
 
     if(idx <= mid) {
         update(node*2, s, mid, idx);
@@ -47,7 +47,7 @@ void update(ll node, ll s, ll e, ll idx) {
     t[node] = t[node*2] + t[node*2+1];
 }
 
-ll find(ll node, ll s, ll e, ll l, ll r) {
+int find(int node, int s, int e, int l, int r) {
     if(l>e || r<s) {
         return 0;
     }
@@ -55,7 +55,7 @@ ll find(ll node, ll s, ll e, ll l, ll r) {
         return t[node];
     }
 
-    ll mid = (s+e)/2;
+    int mid = (s+e)/2;
     return find(node*2, s, mid, l, r) + find(node*2+1, mid+1, e, l, r);
 }
 
@@ -66,7 +66,7 @@ int main() {
     cin >> N;
 
     for(int i=1; i<=N; i++) {
-        ll x;
+        int x;
         cin >> x;
         vec.push_back({x, i});
     }
@@ -74,7 +74,7 @@ int main() {
 
 
 
-    ll ans = 0;
+    long long ans = 0;
     for(int i=0; i<N; i++) {
         auto [v, idx] = vec[i];
         ans += find(1, 1, N, idx+1, N);
