@@ -8,20 +8,19 @@ int dp[1<<16][16];
 int ans = 1;
 
 int dfs(int status, int cur, int cost) {
-    int cur_status = status | (1<<cur);
-    if(dp[cur_status][cur]) {
-        return dp[cur_status][cur];
+    if(dp[status][cur]) {
+        return dp[status][cur];
     }
 
     int len = 0;
     for(int i=1; i<N; i++) {
-        if(cost > buy[cur][i] || (cur_status & (1<<i)) || i == cur) continue;
-        len = max(len, dfs(cur_status | (1<<cur), i, buy[cur][i])+1); 
+        if(cost > buy[cur][i] || (status & (1<<i)) || i == cur) continue;
+        len = max(len, dfs(status | (1<<cur), i, buy[cur][i])+1); 
     }
 
-    // cout << cur_status << ' ' << cur << ' ' << cost << ' ' << len << '\n';
+    // cout << status << ' ' << cur << ' ' << cost << ' ' << len << '\n';
 
-    return dp[cur_status][cur] = len;
+    return dp[status][cur] = len;
 }
 
 int main() {
@@ -39,6 +38,7 @@ int main() {
     
 
     cout << dfs(0, 0, 0)+1;
+
 
     return 0;
 }
