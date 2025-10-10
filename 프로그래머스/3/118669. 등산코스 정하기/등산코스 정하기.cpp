@@ -1,79 +1,145 @@
 #include <string>
 #include <vector>
+#include <algorithm>
 #include <queue>
 #include <iostream>
+
+#define NONE 0
+#define GATE 1
+#define SUMMIT 2
 
 #define pii pair<int, int>
 
 using namespace std;
 
-vector<vector<pii>> g; // {cost, idx}
-
+int parent[50005];
+pii type[50005];
 bool isGate[50005];
 bool isSummit[50005];
 
-int dist[50005];
+struct Edge {
+    int a;
+    int b;
+    int cost;
+    
+    void print_() {
+        cout << cost << ' ' << a << ' ' << b << '\n';
+    }
+};
 
-vector<pii> answers;
+bool cmp(const Edge& a, const Edge& b) {
+    if(a.cost == b.cost) {
+        int sa = isSummit[a.a] ? a.a : isSummit[a.b] ? a.b : -1;
+        if(sa != -1 && isSummit[a.b]) {
+            sa = min(sa, a.b);
+        }
+        int sb = isSummit[b.a] ? b.a : isSummit[b.b] ? b.b : -1;
+        if(sb != -1 && isSummit[b.b]) {
+            sb = min(sb, b.b);
+        }
+        return sa < sb;    
+    }
+    return a.cost < b.cost;
+}
+
+int find(int a) {
+    if(a == parent[a]) return a;
+    
+    return parent[a] = find(parent[a]);
+}
+
+void merge(int a, int b, int t, int src) {
+    int pa = find(a);
+    int pb = find(b);
+    
+    if(pa==pb) return;
+    if(pa>pb) swap(pa, pb);
+    
+    parent[pb] = pa;
+    type[pa] = {t, src};
+}
+
+pii getType(int a) {
+    int pa = find(a);
+    
+    return type[pa];
+}
 
 vector<int> solution(int N, vector<vector<int>> paths, vector<int> gates, vector<int> summits) {
-    vector<int> answer;
+    vector<vector<int>> answer;
     
-    // 가상의 0번 노드 -> gates 각각 비용 0으로 연결     
-    // 0번에서 다익스트라
-    // summits들 중 가중치 가장 작고, 그 중 인덱스 가장 작은거 선택
+    // 다익스트라 paths * gates 번 = O(ElogV * N^2) 시간초과
     
-    
-    g.assign(N+1, vector<pii>());
-    fill_n(dist, N+1, 111111111111111);
-    dist[0] = 0;
-    for(auto p: paths) {
-        int from = p[0];
-        int to = p[1];
-        int cost = p[2];
-        g[from].push_back({cost, to});
-        g[to].push_back({cost, from});
-    }
-    for(int gate: gates) {
-        isGate[gate] = true;
-        
-        g[0].push_back({0, gate}); // 가상의 노드 0과 gate 연결
+    // MST 만들기
+    // 작은 간선부터 계속 잇다가 path, gate 이어지는 순간에 컷
+    // paths끼리, gates끼리 안 이어지게끔 조건 설정
+    // 간선 하나에 path, gate 연결, path 두 개, 혹은 gate 두 개 고려
+    for(int g: gates) {
+        isGate[g] = true;
     }
     for(int s: summits) {
         isSummit[s] = true;
     }
-    
-    priority_queue<pii, vector<pii>, greater<pii>> pq;
-    pq.push({0, 0});
-    
-    while(!pq.empty()) {
-        pii p = pq.top();
-        pq.pop();
-        int cost = p.first;
-        int cur = p.second;
-        
-        for(pii next: g[cur]) {
-            if(dist[next.second] > max(next.first, cost)) {
-                dist[next.second] = max(next.first, cost);
-                if(!isSummit[next.second]) {
-                    pq.push({dist[next.second], next.second});    
-                }
-            }
+    for(int i=1; i<=N; i++) {
+        parent[i] = i;
+        if(isGate[i]) {
+            type[i] = {GATE, i};
+        } else if(isSummit[i]) {
+            type[i] = {SUMMIT, i};
+        } else {
+            type[i] = {NONE, i};
         }
     }
     
-    int minVal = 2111111111;
-    int idx = -1;
-    for(int s: summits) {
-        if(dist[s] < minVal) {
-            minVal = dist[s];
-            idx = s;
-        } else if(dist[s] == minVal && s < idx) {
-            idx = s;
-        } 
+    vector<Edge> edges;
+    for(auto path: paths) {
+        edges.push_back({path[0], path[1], path[2]});
+    }
+    sort(edges.begin(), edges.end(), cmp);
+    
+    for(Edge e: edges) {
+        int a = find(e.a);
+        int b = find(e.b);
+        if(a == b) continue;
+        pii pa = getType(a);
+        pii pb = getType(b);
+        int ta = pa.first;
+        int tb = pb.first;
+        if(ta == GATE && tb == GATE) continue;
+        if(ta == SUMMIT && tb == SUMMIT) continue;
+        
+        if(ta == GATE && tb == SUMMIT) {
+            vector<int> temp;
+            temp.push_back(pb.second);
+            temp.push_back(e.cost);
+            answer.push_back(temp);
+        } else if(ta == SUMMIT && tb == GATE) {
+            vector<int> temp;
+            temp.push_back(pa.second);
+            temp.push_back(e.cost);
+            answer.push_back(temp);
+        }
+        
+        int t = max(ta, tb);
+        int src = ta >= tb ? pa.second : pb.second;
+        merge(a, b, t, src);
     }
     
-    answer.push_back(idx);
-    answer.push_back(minVal);
-    return answer;
+    int cost = 2111111111;
+    int idx = -1;
+    for(vector<int> v: answer) {
+        if(v[1] == cost) {
+            if(v[0] < idx) {
+                idx = v[0];
+            }
+        } else if(v[1] < cost) {
+            cost = v[1];
+            idx = v[0];
+        }
+    }
+    
+    vector<int> a;
+    a.push_back(idx);
+    a.push_back(cost);
+    return a;
 }
