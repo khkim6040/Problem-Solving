@@ -1,10 +1,10 @@
 # [level 3] 봉인된 주문 - 389481 
 
-[문제 링크](https://school.programmers.co.kr/learn/courses/30/lessons/389481?language=cpp) 
+[문제 링크](https://school.programmers.co.kr/learn/courses/30/lessons/389481) 
 
 ### 성능 요약
 
-메모리: 35.8 MB, 시간: 42.98 ms
+메모리: 35.9 MB, 시간: 43.08 ms
 
 ### 구분
 
@@ -16,7 +16,7 @@
 
 ### 제출 일자
 
-2025년 10월 29일 16:36:10
+2025년 11월 05일 12:58:19
 
 ### 문제 설명
 

@@ -1,66 +1,56 @@
 #include <string>
 #include <vector>
 #include <algorithm>
-#include <iostream>
 
-#define ll long long 
-#define SIZE 26
-
+#define ll long long
+#define CNT 26
 using namespace std;
 
-string mapper = "abcdefghijklmnopqrstuvwxyz";
-vector<ll> ibans;
 
-ll strToInt(string s) {
-    ll ret = 0;
-    int size = s.size();
-    for(int i=0; i<size; i++) {
-        ret *= SIZE;
-        ret += (s[i] - 'a' + 1);
-    }
-    return ret;
-}
-
-string intToStr(ll x) {
+string toString(ll x) {
+    // 1~26: a~z
+    // 27~52: aa~az
     string ret = "";
-    
-    while(x) {
+    while(x > 0) {
         x--;
-        char alp = mapper[x%(SIZE)];
-        ret.push_back(alp);
-        x /= SIZE;
-        
+        ll div = x/CNT;
+        int rem = x%CNT;
+        ret += (char)('a'+rem);
+        x/=CNT;
     }
-    
     reverse(ret.begin(), ret.end());
-    
     return ret;
 }
 
+ll toInt(string s) {
+    int size = s.size();
+    ll ret = 0;
+    for(int i=0; i<size; i++) {
+        int n = s[i] - 'a';
+        ret *= CNT;
+        ret += n+1;
+    }
+    return ret;
+}
 
 string solution(long long n, vector<string> bans) {
-    // a-z 개수 26
-    // aa-zz 개수 26*26
-    // 각 레벨 별 개수 26^h
-    // bans 문자열들을 숫자로 변환
-    // n 보다 작은 bans 가 없을 때까지 반복
-        // 차이만큼 n에 더함
-    // n을 문자열로 변환
+    string answer = "";
     
-    
-    for(string s: bans) {
-        ibans.push_back(strToInt(s));
+    // bans를 int로 변환
+    vector<ll> b;
+    for(string ban: bans) {
+        b.push_back(toInt(ban));
     }
-    sort(ibans.begin(), ibans.end());
+    sort(b.begin(), b.end());
     
-    int bansSize = bans.size();
-    for(int i=0; i<bansSize; i++) {
-        if(n >= ibans[i]) {
+    // for ban: bans
+    for(auto ban: b) {
+        if(n>=ban) {
             n++;
         } else {
             break;
         }
     }
     
-    return intToStr(n);
+    return toString(n);
 }
