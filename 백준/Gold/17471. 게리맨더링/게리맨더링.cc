@@ -72,8 +72,7 @@ int main() {
         ans = min(ans, get_diff(state));
     }
 
-    if(ans==INF) cout << -1;
-    else cout << ans;
+    cout << (ans==INF ? -1 : ans);
 
     return 0;
 }
