@@ -24,7 +24,6 @@ void bfs(int pr, int pc) {
         pii cur = q.front();
         q.pop();
 
-        int cnt = 0;
         for(int i=0; i<4; i++) {
             int r = cur.first + dr[i];
             int c = cur.second + dc[i];
@@ -64,17 +63,14 @@ int main() {
             }
         }
 
+        if(cnt != 1) break;
+        ans++;
+
         for(int i=0; i<N; i++) {
             for(int j=0; j<M; j++) {
                 b[i][j] = max(0, b[i][j]-melt[i][j]); 
-                // cout << b[i][j] << ' ';
             }
-            // cout << '\n';
         }
-        // cout << '\n';
-
-        if(cnt != 1) break;
-        ans++;
     }
 
     if(cnt == 0) {
