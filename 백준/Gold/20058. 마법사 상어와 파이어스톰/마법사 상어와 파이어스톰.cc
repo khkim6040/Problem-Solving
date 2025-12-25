@@ -5,7 +5,7 @@
 #include <cstring>
 
 #define pii pair<int, int>
-#define SIZE 256
+#define SIZE 111
 using namespace std;
 
 int N, Q;
@@ -43,7 +43,7 @@ void tornado(int level) {
         }
     }
 
-    memcpy(&b[0][0], &tmp[0][0], SIZE*SIZE);
+    memcpy(&b[0][0], &tmp[0][0], sizeof(b));
 }
 
 void melt() {
@@ -65,7 +65,7 @@ void melt() {
         }
     }
 
-    memcpy(&b[0][0], &tmp[0][0], SIZE*SIZE);
+    memcpy(&b[0][0], &tmp[0][0], sizeof(b));
 }
 
 int bfs(int pr, int pc) {
