@@ -5,7 +5,7 @@
 #include <cstring>
 
 #define pii pair<int, int>
-#define SIZE 500
+#define SIZE 288
 using namespace std;
 
 int N, Q;
@@ -25,17 +25,19 @@ void tornado(int level) {
             for(int i=0; i<width; i++) {
                 for(int j=0; j<width; j++) {
                     // 원점 기준으로 맞춤
-                    // int tr = 2*i - width + 1;
-                    // int tc = 2*j - width + 1;
+                    int tr = 2*i - width + 1;
+                    int tc = 2*j - width + 1;
                     // 90도 회전
-                    // int ttr = tr;
-                    // tr = tc;
-                    // tc = -ttr;
+                    int ttr = tr;
+                    tr = tc;
+                    tc = -ttr;
                     // 원래 좌표로 이동
-                    // int r = (tr + width - 1)/2;
-                    // int c = (tc + width - 1)/2;
+                    int r = (tr + width - 1)/2;
+                    int c = (tc + width - 1)/2;
 
-                    tmp[cur_r+j][cur_c+(width-1-i)] = b[cur_r+i][cur_c+j];
+                    // tmp[cur_r+j][cur_c+(width-1-i)] = b[cur_r+i][cur_c+j];
+                    tmp[cur_r+r][cur_c+c] = b[cur_r+i][cur_c+j];
+                    
                 }
             }
         }
