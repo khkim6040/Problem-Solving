@@ -5,7 +5,7 @@
 #include <cstring>
 
 #define pii pair<int, int>
-#define SIZE 288
+#define SIZE 256
 using namespace std;
 
 int N, Q;
