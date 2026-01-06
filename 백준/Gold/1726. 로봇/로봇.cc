@@ -51,39 +51,53 @@ int main() {
     int r1, c1, d1, r2, c2, d2;
     cin >> r1 >> c1 >> d1 >> r2 >> c2 >> d2;
 
-    priority_queue<Node> q;
+    queue<Node> q;
     q.push({r1, c1, d1, 0});
     visited[r1][c1][d1] = true;
 
-    int ans = 2111111111;
+    int ans = -1;
     while(!q.empty()) {
-        Node cur = q.top();
+        Node cur = q.front();
         q.pop();
 
         // cur.prt();
 
-        if(cur.r == r2 && cur.c == c2) {
-            ans = min(ans, cur.cnt + get_turn_cnt(cur.d, d2));
-            continue;
+        if(cur.r == r2 && cur.c == c2 && cur.d == d2) {
+            ans = cur.cnt;
+            break;
         }
 
-        for(int d=1; d<=4; d++) {
-            int r = cur.r;
-            int c = cur.c;
-            int turn_cnt = get_turn_cnt(cur.d, d);
-            int cnt = 0;
+        // 직진
+        int r = cur.r;
+        int c = cur.c;
+        int cnt = 0;
 
-            while(cnt<3) {
-                cnt++;
-                r = r + dr[d-1];
-                c = c + dc[d-1];
-                if(r<=0 || r>N || c<=0 || c>M || b[r][c]==1) break;
-                if(visited[r][c][d]) continue;
-                visited[r][c][d] = true;
-                q.push({r, c, d, cur.cnt+turn_cnt+1});
-            }
+        while(cnt<3) {
+            cnt++;
+            r = r + dr[cur.d-1];
+            c = c + dc[cur.d-1];
+            if(r<=0 || r>N || c<=0 || c>M || b[r][c]==1) break;
+            if(visited[r][c][cur.d]) continue;
+            visited[r][c][cur.d] = true;
+            q.push({r, c, cur.d, cur.cnt+1});
         }
 
+        // 좌/우 회전
+        vector<int> dirs;
+        if(cur.d<=2) {
+            dirs.push_back(3);
+            dirs.push_back(4);
+        } else {
+            dirs.push_back(1);
+            dirs.push_back(2);
+        }
+
+        for(int i=0; i<2; i++) {
+            int d = dirs[i];
+            if(visited[cur.r][cur.c][d]) continue;
+            visited[cur.r][cur.c][d] = true;
+            q.push({cur.r, cur.c, d, cur.cnt+1});
+        }
     }
 
     cout << ans;
