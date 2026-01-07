@@ -38,13 +38,13 @@ int main() {
         }
     }
 
-    priority_queue<Node> q;
-    q.push({1, 1, 0});
+    deque<Node> q;
+    q.push_back({1, 1, 0});
     dist[1][1] = 0;
 
     while(!q.empty()) {
-        Node cur = q.top();
-        q.pop();
+        Node cur = q.front();
+        q.pop_front();
 
         if(cur.r == N && cur.c == M) break;
 
@@ -54,9 +54,11 @@ int main() {
             if(r<=0 || r>N || c<=0 || c>M) continue;
             int d = cur.cnt;
             if(b[r][c]==1) d++;
+
             if(d < dist[r][c]) {
                 dist[r][c] = d;
-                q.push({r, c, d});
+                if(b[r][c]==0) q.push_front({r, c, d});
+                else q.push_back({r, c, d});
             }
         }
     }
