@@ -1,5 +1,5 @@
 #include <iostream>
-#include <unordered_set>
+#include <queue>
 
 using namespace std;
 
@@ -13,47 +13,35 @@ int main() {
 
     cin >> N >> K;
 
-    unordered_set<int> s;
-    s.insert(N);
+    queue<int> q;
+    q.push(N);
     cnt[N] = 1;
-    fill_n(&dist[0], 100005, 2111111111);
+    int INF = 2111111111;
+    fill_n(&dist[0], 100005, INF);
     dist[N] = 0;
 
     int time = 0;
-    while(cnt[K] == 0) {
-        unordered_set<int> tmp;
-        // cout << "TIME: " << time << '\n';
-        for(int cur: s) {
-            // cout << cur << ' ' << cnt[cur] << '\n';
-            if(cur+1 <= 100000 && time <= dist[cur+1]) {
-                cnt[cur+1] += cnt[cur];
-                dist[cur+1] = time;
-                tmp.insert(cur+1);
-            }
-
-            if(cur-1 >= 0 && time <= dist[cur-1]) {
-                cnt[cur-1] += cnt[cur];
-                dist[cur-1] = time;
-                tmp.insert(cur-1);
-            }
-
-            if(cur*2 <= 100000 && time <= dist[cur*2]) {
-                cnt[cur*2] += cnt[cur];
-                dist[cur*2] = time;
-                tmp.insert(cur*2);
+    while(cnt[K]==0) {
+        int size = q.size();
+        for(int i=0; i<size; i++) {
+            int cur = q.front();
+            q.pop();
+            
+            int nexts[] = {cur+1, cur-1, cur*2};
+            for(int next: nexts) {
+                if(next<0 || next>100000) continue;
+                if(dist[next] == INF) {
+                    dist[next] = dist[cur]+1;
+                    cnt[next] = cnt[cur];
+                    q.push(next);
+                } else if(dist[next] == dist[cur]+1) {
+                    cnt[next] += cnt[cur];
+                }
             }
         }
-
-        s = tmp;
-        time++;
     }
 
-    // for(int i=0; i<=100000; i++) {
-    //     if(!cnt[i]) continue;
-    //     cout << i << ' ' << cnt[i] << '\n';
-    // }
-
-    cout << time << '\n' << cnt[K]; 
+    cout << dist[K] << '\n' << cnt[K]; 
 
     return 0;
 }
