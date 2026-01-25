@@ -17,31 +17,31 @@ int main() {
 
     cin >> N >> M;
 
-    for(int i=0; i<N; i++) {
-        cin >> b[i];
-        if(i==0) pref_sum[i] = b[i];
-        else pref_sum[i] = pref_sum[i-1] + b[i];
+    pref_sum[0] = 0;
+    for(int i=1; i<=N; i++) {
+        cin >> pref_sum[i];
+        pref_sum[i] += pref_sum[i-1];
     }
 
     fill_n(&dp[0][0], 111*55, -111111111);
-    dp[0][1] = b[0];
-    for(int i=1; i<N; i++) {
-        dp[i][1] = max(dp[i-1][1], pref_sum[i]);
-        for(int j=i; j>0; j--) {
-            dp[i][1] = max(dp[i][1], pref_sum[i]-pref_sum[j-1]);
+    dp[1][1] = pref_sum[1];
+    for(int i=2; i<=N; i++) {
+        dp[i][1] = dp[i-1][1];
+        for(int j=i-1; j>=0; j--) {
+            dp[i][1] = max(dp[i][1], pref_sum[i]-pref_sum[j]);
         }
     }
 
     for(int k=2; k<=M; k++) {
-        for(int i=2; i<N; i++) {
+        for(int i=3; i<=N; i++) {
             dp[i][k] = dp[i-1][k];
-            for(int j=i; j-2>=0; j--) {
-                dp[i][k] = max(dp[i][k], dp[j-2][k-1]+pref_sum[i]-pref_sum[j-1]);
+            for(int j=i-1; j-1>=1; j--) {
+                dp[i][k] = max(dp[i][k], dp[j-1][k-1]+pref_sum[i]-pref_sum[j]);
             }
         }
     }
 
-    cout << dp[N-1][M];
+    cout << dp[N][M];
 
     return 0;
 }
